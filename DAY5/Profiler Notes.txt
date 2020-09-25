@@ -69,3 +69,129 @@ web
 
 pdf 
 
+
+
+
+BLOCK PROFILING COMMANDS
+------------------------
+
+GO TO 03_BLOCKING_PROFILE FOLDER 
+
+
+
+
+terminal 1 :
+
+go tool pprof http://localhost:6060/pprof/block
+
+terminal 2 :
+
+go run main.go
+
+
+run terminal 2 command 
+
+run terminal 1 command 
+
+wait for pprof prompt 
+
+test all three types of routines 
+
+top
+
+top10 -cum
+
+list Wait
+
+
+list runtime.main
+
+
+list main.main 
+
+
+
+
+
+
+
+C:\Users\SushiMahi>go tool pprof http://127.0.0.1:6060/debug/pprof/block
+Fetching profile over HTTP from http://127.0.0.1:6060/debug/pprof/block
+Saved profile in C:\Users\SushiMahi\pprof\pprof.contentions.delay.003.pb.gz
+Type: delay
+Time: Sep 25, 2020 at 4:12pm (IST)
+Entering interactive mode (type "help" for commands, "o" for options)
+(pprof) top
+Showing nodes accounting for 973.06s, 100% of 973.06s total
+      flat  flat%   sum%        cum   cum%
+      953s 97.94% 97.94%       953s 97.94%  runtime.chansend1
+    20.07s  2.06%   100%     20.07s  2.06%  sync.(*WaitGroup).Wait
+         0     0%   100%     20.07s  2.06%  main.main
+         0     0%   100%       953s 97.94%  main.performTask
+         0     0%   100%     20.07s  2.06%  runtime.main
+(pprof) list main.performTask
+Total: 16.22mins
+ROUTINE ======================== main.performTask in C:\Users\SushiMahi\Google Drive\00HDD\GOLANGCLASSROOM\DAY5\problemdetermination\03_blocking_profiling\02_channel_send\main.go
+         0  15.88mins (flat, cum) 97.94% of Total
+         .          .     40:
+         .          .     41:           wg.Done()
+         .          .     42:   }()
+         .          .     43:
+         .          .     44:   // wait for semaphore
+         .  15.88mins     45:   semaphore <- struct{}{}
+         .          .     46:
+         .          .     47:   // do some task that takes a long time
+         .          .     48:   done := time.After(1 * time.Second)
+         .          .     49:   x := 0
+         .          .     50:
+(pprof) list runtime.chansend1
+Total: 16.22mins
+ROUTINE ======================== runtime.chansend1 in c:\go\src\runtime\chan.go
+ 15.88mins  15.88mins (flat, cum) 97.94% of Total
+         .          .    138:}
+         .          .    139:
+         .          .    140:// entry point for c <- x from compiled code
+         .          .    141://go:nosplit
+         .          .    142:func chansend1(c *hchan, elem unsafe.Pointer) {
+ 15.88mins  15.88mins    143:   chansend(c, elem, true, getcallerpc())
+         .          .    144:}
+         .          .    145:
+         .          .    146:/*
+         .          .    147: * generic single channel send/recv
+         .          .    148: * If block is not nil,
+(pprof)
+
+
+
+
+
+
+
+C:\Users\SushiMahi>go tool pprof http://127.0.0.1:6060/debug/pprof/mutex
+Fetching profile over HTTP from http://127.0.0.1:6060/debug/pprof/mutex
+Saved profile in C:\Users\SushiMahi\pprof\pprof.contentions.delay.005.pb.gz
+Type: delay
+Time: Sep 25, 2020 at 4:16pm (IST)
+Entering interactive mode (type "help" for commands, "o" for options)
+(pprof) top
+Showing nodes accounting for 7.60mins, 100% of 7.60mins total
+      flat  flat%   sum%        cum   cum%
+  7.60mins   100%   100%   7.60mins   100%  sync.(*Mutex).Unlock (inline)
+         0     0%   100%   7.60mins   100%  main.performTask
+(pprof) list main.performTask
+Total: 7.60mins
+ROUTINE ======================== main.performTask in C:\Users\SushiMahi\Google Drive\00HDD\GOLANGCLASSROOM\DAY5\problemdetermination\04_mutex_profiling\01_mutex\main.go
+         0   7.60mins (flat, cum)   100% of Total
+         .          .     40:   defer wg.Done()
+         .          .     41:
+         .          .     42:   for x := 0; x < 100000; x++ {
+         .          .     43:           mutex.Lock()
+         .          .     44:           counter++
+         .   7.60mins     45:           mutex.Unlock()
+         .          .     46:   }
+         .          .     47:}
+(pprof) web
+
+
+
+
