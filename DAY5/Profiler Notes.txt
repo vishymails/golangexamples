@@ -1,0 +1,71 @@
+
+
+Create .go file consists of business methods 
+add separate program to profile it or include net/http/pprof package
+If you maintain separate files then call main program functions in 
+profiler application 
+
+
+Install Apache24 
+Install GrapghViz
+
+Add 
+
+c:\Apache24\bin
+c:\GraphViz\bin 
+to path in system variables settings 
+
+
+
+Example : 
+
+
+Create folder named problem determination 
+
+
+go mod init vishymails.com
+
+create example1 folder
+ 
+copy main1.go 
+
+
+cd example1
+
+
+go run main1.go 
+
+
+open two terminal windows 
+
+In one window use 
+
+ab -k -c 8 -n 100000 "http://127.0.0.1:8080/v1/leftpad/?str=test&len=10&chr=*"
+
+do not press enter wait for second window to be ready 
+
+
+In another terminal 
+
+go tool pprof http://localhost:8080/debug/pprof/profile
+
+then start second terminal and then first terminal 
+
+wait for 30 seconds 
+
+
+then go to second prompt 
+
+you get 
+(pprof) prompt 
+
+
+try below commands
+
+
+top
+
+web 
+
+pdf 
+
